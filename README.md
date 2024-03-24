@@ -23,7 +23,7 @@ and location name. When using the code templates for this north carolina
 county example, we’ll be replacing ‘scope’, ‘region’, and ‘locations’ as
 follows
 
-  - ‘scope’ -\> ‘northcarolina’
+  - ‘scope’ -\> ‘brasil’
   - ‘region’ -\> ‘county’
   - ‘locations’ -\> a vector of region names
 
@@ -53,26 +53,25 @@ usethis::use_data_raw()
 The reference data should have just the id columns and the geometry.
 Then it should be named similar to this:
 
-geo\_reference\_northcarolina\_county
+geo\_reference\_brasil\_
 
 Where ‘northcarolina’ is is the character string that will replace
 ‘scope’ when using the code templates, and ‘county’ is the character
 string that will replace region in the
 
 ``` r
-nc <- sf::st_read(system.file("shape/nc.shp", package="sf"))
-#> Reading layer `nc' from data source 
-#>   `/Library/Frameworks/R.framework/Versions/4.2/Resources/library/sf/shape/nc.shp' 
-#>   using driver `ESRI Shapefile'
-#> Simple feature collection with 100 features and 14 fields
-#> Geometry type: MULTIPOLYGON
-#> Dimension:     XY
-#> Bounding box:  xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
-#> Geodetic CRS:  NAD27
+br_state <- geobr::read_state(simplified = T)
+#> Loading required namespace: sf
+#> Using year 2010
+#>   |                                                                              |                                                                      |   0%  |                                                                              |===                                                                   |   4%  |                                                                              |=====                                                                 |   7%  |                                                                              |========                                                              |  11%  |                                                                              |==========                                                            |  15%  |                                                                              |=============                                                         |  19%  |                                                                              |================                                                      |  22%  |                                                                              |==================                                                    |  26%  |                                                                              |=====================                                                 |  30%  |                                                                              |=======================                                               |  33%  |                                                                              |==========================                                            |  37%  |                                                                              |=============================                                         |  41%  |                                                                              |===============================                                       |  44%  |                                                                              |==================================                                    |  48%  |                                                                              |====================================                                  |  52%  |                                                                              |=======================================                               |  56%  |                                                                              |=========================================                             |  59%  |                                                                              |============================================                          |  63%  |                                                                              |===============================================                       |  67%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  74%  |                                                                              |======================================================                |  78%  |                                                                              |=========================================================             |  81%  |                                                                              |============================================================          |  85%  |                                                                              |==============================================================        |  89%  |                                                                              |=================================================================     |  93%  |                                                                              |===================================================================   |  96%  |                                                                              |======================================================================| 100%
+br_muni <- geobr::read_municipality()
+#> Using year 2010
+#>   |                                                                              |                                                                      |   0%  |                                                                              |===                                                                   |   4%  |                                                                              |=====                                                                 |   7%  |                                                                              |========                                                              |  11%  |                                                                              |==========                                                            |  15%  |                                                                              |=============                                                         |  19%  |                                                                              |================                                                      |  22%  |                                                                              |==================                                                    |  26%  |                                                                              |=====================                                                 |  30%  |                                                                              |=======================                                               |  33%  |                                                                              |==========================                                            |  37%  |                                                                              |=============================                                         |  41%  |                                                                              |===============================                                       |  44%  |                                                                              |==================================                                    |  48%  |                                                                              |====================================                                  |  52%  |                                                                              |=======================================                               |  56%  |                                                                              |=========================================                             |  59%  |                                                                              |============================================                          |  63%  |                                                                              |===============================================                       |  67%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  74%  |                                                                              |======================================================                |  78%  |                                                                              |=========================================================             |  81%  |                                                                              |============================================================          |  85%  |                                                                              |==============================================================        |  89%  |                                                                              |=================================================================     |  93%  |                                                                              |===================================================================   |  96%  |                                                                              |======================================================================| 100%
 
-geo_reference_northcarolina_county <- nc |>
-  dplyr::select(county_name = NAME, fips = FIPS) |>
-  sf2stat:::sf_df_prep_for_stat(id_col_name = "county_name")
+
+geo_reference_brasil_state <- br_state |>
+  dplyr::select(state_name = name_state, state_code = code_state, state_abbrev = abbrev_state, geometry = geom) |>
+  sf2stat:::sf_df_prep_for_stat(id_col_name = "state_name")
 #> Warning in st_point_on_surface.sfc(sf::st_zm(dplyr::pull(sf_df, geometry))):
 #> st_point_on_surface may not give correct results for longitude/latitude data
 #> Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if
@@ -84,14 +83,24 @@ geo_reference_northcarolina_county <- nc |>
 #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 #> generated.
 
-usethis::use_data(geo_reference_northcarolina_county, overwrite = T)
-#> ✔ Setting active project to '/Users/evangelinereynolds/Google Drive/r_packages/ggsomewhere'
-#> ✔ Saving 'geo_reference_northcarolina_county' to 'data/geo_reference_northcarolina_county.rda'
+geo_reference_brasil_muni <- br_muni |>
+  dplyr::select(muni_name = name_muni, muni_code = code_muni, state_abbrev = abbrev_state, geometry = geom) |>
+  sf2stat:::sf_df_prep_for_stat(id_col_name = "muni_name")
+#> Warning in st_point_on_surface.sfc(sf::st_zm(dplyr::pull(sf_df, geometry))):
+#> st_point_on_surface may not give correct results for longitude/latitude data
+
+usethis::use_data(geo_reference_brasil_state, overwrite = T)
+#> ✔ Setting active project to '/Users/evangelinereynolds/Google
+#> Drive/r_packages/ggbrasil2'
+#> ✔ Saving 'geo_reference_brasil_state' to 'data/geo_reference_brasil_state.rda'
+#> • Document your data (see 'https://r-pkgs.org/data.html')
+usethis::use_data(geo_reference_brasil_muni, overwrite = T)
+#> ✔ Saving 'geo_reference_brasil_muni' to 'data/geo_reference_brasil_muni.rda'
 #> • Document your data (see 'https://r-pkgs.org/data.html')
 ```
 
 ``` r
-readme2pkg::chunk_to_dir("nc_geo_reference_prep", 
+readme2pkg::chunk_to_dir("geo_reference_brasil_state", 
                          dir = "data-raw/")
 ```
 
@@ -99,11 +108,18 @@ readme2pkg::chunk_to_dir("nc_geo_reference_prep",
 
 ``` r
 readme2pkg::chunk_variants_to_dir(chunk_name = "stat_region_template",
-                                  file_name = "stat_county.R",
+                                  file_name = "stat_state.R",
                                   replace1 = "scope",
-                                  replacements1 = "northcarolina",
+                                  replacements1 = "brasil",
                                   replace2 = "region",
-                                  replacements2 = "county")
+                                  replacements2 = "state")
+
+readme2pkg::chunk_variants_to_dir(chunk_name = "stat_region_template",
+                                  file_name = "stat_muni.R",
+                                  replace1 = "scope",
+                                  replacements1 = "brasil",
+                                  replace2 = "region",
+                                  replacements2 = "muni")
 ```
 
 ``` r
@@ -164,38 +180,51 @@ stat_region <- function(
 ### test it out `stat_county()`
 
 ``` r
-source("./R/stat_county.R")
+source("./R/stat_state.R")
+source("./R/stat_muni.R")
+
+
 
 library(ggplot2)
 
-nc <- sf::st_read(system.file("shape/nc.shp", package="sf"))
-#> Reading layer `nc' from data source 
-#>   `/Library/Frameworks/R.framework/Versions/4.2/Resources/library/sf/shape/nc.shp' 
-#>   using driver `ESRI Shapefile'
-#> Simple feature collection with 100 features and 14 fields
-#> Geometry type: MULTIPOLYGON
-#> Dimension:     XY
-#> Bounding box:  xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
-#> Geodetic CRS:  NAD27
 
-nc |>
+br_state |>
   sf::st_drop_geometry() |>
   ggplot() +
-  aes(fips = FIPS) +
-  stat_county() + 
-  aes(fill = BIR79)
-#> Joining with `by = join_by(fips)`
+  aes(state_name = name_state) +
+  stat_state(alpha = .4) + 
+  aes(fill = name_region)
+#> Joining with `by = join_by(state_name)`
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+
+br_muni |>
+  sf::st_drop_geometry() |>
+  ggplot() +
+  aes(muni_code = code_muni) +
+  stat_muni(alpha = .4, linewidth = .02) + 
+  aes(fill = abbrev_state)
+#> Joining with `by = join_by(muni_code)`
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
 
 ## Use template to create useful derivitive functions
 
 ``` r
 readme2pkg::chunk_variants_to_dir(chunk_name = "geom_region_template",
-                                  file_name = "geom_county.R",
+                                  file_name = "geom_state.R",
                                   replace1 = "region",
-                                  replacements1 = "county")
+                                  replacements1 = "state")
+
+
+readme2pkg::chunk_variants_to_dir(chunk_name = "geom_region_template",
+                                  file_name = "geom_muni.R",
+                                  replace1 = "region",
+                                  replacements1 = "muni")
 ```
 
 ``` r
@@ -219,29 +248,36 @@ stamp_region_label <- function(...){
 ### try those out
 
 ``` r
-source("./R/geom_county.R")
+source("./R/geom_state.R")
+source("./R/geom_muni.R")
 
-nc |>
+
+br_state |>
   sf::st_drop_geometry() |>
   ggplot() +
-  aes(fips = FIPS) +
-  geom_county() + 
-  geom_county_label(check_overlap = T,
+  aes(state_name = name_state) +
+  geom_state() + 
+  geom_state_label(check_overlap = T,
                     color = "grey85") +
-  aes(fill = BIR79) 
-#> Joining with `by = join_by(fips)`
-#> Joining with `by = join_by(fips)`
+  aes(fill = name_region) 
+#> Joining with `by = join_by(state_name)`
+#> Joining with `by = join_by(state_name)`
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 
-last_plot() + 
-  stamp_county() + 
-  stamp_county_label()
-#> Joining with `by = join_by(fips)`
-#> Joining with `by = join_by(fips)`
+br_muni |>
+  sf::st_drop_geometry() |>
+  ggplot() +
+  aes(muni_code = code_muni) + 
+  geom_muni(linewidth = .02) + 
+  geom_muni_label(check_overlap = T,
+                    color = "grey85", size = 3) +
+  aes(fill = abbrev_state)
+#> Joining with `by = join_by(muni_code)`
+#> Joining with `by = join_by(muni_code)`
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
@@ -249,7 +285,7 @@ last_plot() +
 ``` r
 
 ggplot() + 
-  stamp_county()
+  stamp_state()
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->
@@ -257,7 +293,7 @@ ggplot() +
 ``` r
 
 last_plot() + 
-  stamp_county_label(check_overlap = T)
+  stamp_state_label(check_overlap = T)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-4.png)<!-- -->
@@ -265,22 +301,47 @@ last_plot() +
 ``` r
 
 last_plot() + 
-  stamp_county(keep_id = "Wake", fill = "darkred")
+  stamp_state(keep_id = "Amapá", fill = "darkred") +
+  stamp_state_label(keep_id = "Amapá", color = "oldlace")
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-5.png)<!-- -->
 
+``` r
+
+ggplot() + 
+  stamp_muni(linewidth = .02)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-8-6.png)<!-- -->
+
 ## Use template to write convenience functions for each region
 
 ``` r
-locations <- geo_reference_northcarolina_county$county_name
+locations <- geo_reference_brasil_state$state_name
 locations_snake <- tolower(locations) |> 
   stringr::str_replace_all(" ", "_")
 
 readme2pkg::chunk_variants_to_dir(chunk_name = "stamp_region_location", 
-                                  file_name = "stamp_county_location.R",
+                                  file_name = "stamp_state_location.R",
                                   replace1 = "region",
-                                  replacements1 = rep("county", length(locations)),
+                                  replacements1 = rep("state", length(locations)),
+                              replace2 = "location",
+                              replacements2 = locations_snake,
+                              replace3 = "Location", 
+                              replacements3 = locations)
+
+
+locations <- geo_reference_brasil_muni$muni_name
+locations_snake <- tolower(locations) |> 
+  stringr::str_replace_all(" ", "_") |>
+  stringr::str_replace_all("'", "_") |>
+  stringr::str_replace_all("-", "_")
+
+readme2pkg::chunk_variants_to_dir(chunk_name = "stamp_region_location", 
+                                  file_name = "stamp_muni_location.R",
+                                  replace1 = "region",
+                                  replacements1 = rep("muni", length(locations)),
                               replace2 = "location",
                               replacements2 = locations_snake,
                               replace3 = "Location", 
@@ -296,7 +357,7 @@ readme2pkg::chunk_variants_to_dir(chunk_name = "stamp_region_location",
 #' @export
 #'
 #' @examples
-stamp_region_location <- function(...){stamp_region(keep_id = 'Location', ...)}
+stamp_region_location <- function(...){stamp_region(keep_id = "Location", ...)}
 
 #' Title
 #'
@@ -306,28 +367,35 @@ stamp_region_location <- function(...){stamp_region(keep_id = 'Location', ...)}
 #' @export
 #'
 #' @examples
-stamp_region_label_location <- function(...){stamp_region_label(keep_id = 'Location', ...)}
+stamp_region_label_location <- function(...){stamp_region_label(keep_id = "Location", ...)}
 ```
 
 ### Try it out
 
 ``` r
-source("./R/stamp_county_location.R")
+source("./R/stamp_state_location.R")
+source("./R/stamp_muni_location.R")
 
-nc |>
-  sf::st_drop_geometry() |>
-  ggplot() +
-  aes(fips = FIPS) + 
-  stamp_county() + 
-  stamp_county_ashe(fill = "darkred")
+
+#library(ggbrasil2)
+
+ggplot() +
+  aes(state_name = name_state) + 
+  stamp_state() + 
+  stamp_state_espirito_santo(fill = "green") +
+  stamp_state_label_goiás() + 
+  stamp_state_label_maranhão() + 
+  stamp_state_distrito_federal(fill = "red")
 ```
 
 ![](README_files/figure-gfm/last_test-1.png)<!-- -->
 
 ``` r
 
-last_plot() + 
-  stamp_county_label_ashe(color = "oldlace")
+ggplot() +
+  stamp_state() +
+  stamp_muni_alvarães(fill = "magenta") +
+  stamp_muni_água_azul_do_norte(fill = "blue")
 ```
 
 ![](README_files/figure-gfm/last_test-2.png)<!-- -->
